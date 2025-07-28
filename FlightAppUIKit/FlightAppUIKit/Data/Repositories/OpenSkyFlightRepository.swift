@@ -3,11 +3,14 @@ import Combine
 
 final class OpenSkyFlightRepository: FlightRepository {
     private let url = URL(string: "https://opensky-network.org/api/states/all")!
+    private let apiService: APIService
+
+    init(apiService: APIService = .shared) {
+        self.apiService = apiService
+    }
 
     func fetchFlights() -> AnyPublisher<[Flight], Error> {
-        URLSession.shared.dataTaskPublisher(for: url)
-            .map(\.data)
-            .decode(type: OpenSkyResponseDTO.self, decoder: JSONDecoder())
+        apiService.request(url: url, responseType: OpenSkyResponseDTO.self)
             .map { response in
                 response.states.compactMap { FlightMapper.map(dto: $0) }
             }
