@@ -13,10 +13,19 @@ final class AppCoordinator: Coordinator {
     }
 
     func start() {
-        // Temporary blank view controller to start
-        let initialVC = UIViewController()
-        initialVC.view.backgroundColor = .systemBackground
-        initialVC.title = "Flight Tracker"
-        navigationController.pushViewController(initialVC, animated: false)
+        // Step 1: Create Repository
+        let repository = OpenSkyFlightRepository(apiService: APIService.shared)
+
+        // Step 2: Create Use Case
+        let useCase = DefaultFetchFlightsUseCase(repository: repository)
+
+        // Step 3: Create ViewModel
+        let viewModel = FlightListViewModel(fetchFlightsUseCase: useCase)
+
+        // Step 4: Create ViewController
+        let viewController = FlightListViewController(viewModel: viewModel)
+
+        // Step 5: Push to navigation stack
+        navigationController.pushViewController(viewController, animated: false)
     }
 }
