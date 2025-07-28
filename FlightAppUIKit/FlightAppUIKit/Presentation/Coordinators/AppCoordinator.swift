@@ -23,9 +23,15 @@ final class AppCoordinator: Coordinator {
         let viewModel = FlightListViewModel(fetchFlightsUseCase: useCase)
 
         // Step 4: Create ViewController
-        let viewController = FlightListViewController(viewModel: viewModel)
+        let viewController = FlightListViewController(viewModel: viewModel, coordinator: self)
 
         // Step 5: Push to navigation stack
         navigationController.pushViewController(viewController, animated: false)
+    }
+    
+    func showFlightDetail(for flight: Flight) {
+        let viewModel = FlightDetailViewModel(flight: flight)
+        let detailVC = FlightDetailViewController(viewModel: viewModel)
+        navigationController.pushViewController(detailVC, animated: true)
     }
 }
