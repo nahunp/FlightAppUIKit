@@ -8,7 +8,7 @@ public final class DefaultFetchFlightsUseCase: FetchFlightsUseCase {
         self.repository = repository
     }
 
-    public func execute() -> AnyPublisher<[Flight], Error> {
-        return repository.fetchFlights()
+    public func execute(query: String, page: Int) -> AnyPublisher<[Flight], Error> {
+        return repository.fetchFlights(query: query, page: page)
     }
 }
