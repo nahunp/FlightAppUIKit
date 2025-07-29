@@ -19,8 +19,8 @@ final class AppCoordinator: Coordinator {
         // Step 2: Create Use Case
         let useCase = DefaultFetchFlightsUseCase(repository: repository)
 
-        // Step 3: Create ViewModel
-        let viewModel = FlightListViewModel(fetchFlightsUseCase: useCase)
+        // Step 3: Create ViewModel with correct argument label
+        let viewModel = FlightListViewModel(fetchUseCase: useCase)
 
         // Step 4: Create ViewController
         let viewController = FlightListViewController(viewModel: viewModel, coordinator: self)

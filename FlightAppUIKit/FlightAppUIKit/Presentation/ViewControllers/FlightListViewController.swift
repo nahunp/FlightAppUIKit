@@ -9,6 +9,7 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     private let errorLabel = UILabel()
     private let coordinator: AppCoordinator
+    private let searchBar = UISearchBar()
     
     // MARK: - ViewModel
     
@@ -41,6 +42,11 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.placeholder = "Search flights or country"
+        searchBar.delegate = self
+        view.addSubview(searchBar)
+        
         // Table View
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "FlightCell")
@@ -62,9 +68,13 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
         
         // AutoLayout
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -103,7 +113,7 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
     }
 }
 
-extension FlightListViewController {
+extension FlightListViewController: UISearchBarDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.flights.count
     }
@@ -123,5 +133,23 @@ extension FlightListViewController {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedFlight = viewModel.flights[indexPath.row]
         coordinator.showFlightDetail(for: selectedFlight)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        if offsetY > contentHeight - height * 2 {
+            viewModel.loadNextPageIfNeeded(currentIndex: viewModel.flights.count - 1)
+        }
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.searchFlights(query: searchText)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 }
