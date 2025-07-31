@@ -4,10 +4,8 @@ import Foundation
 final class FlightSearchViewModel {
     weak var coordinator: FlightSearchCoordinator?
 
-    // Inputs
     @Published var searchQuery: String = ""
     @Published private(set) var flights: [Flight] = []
-    
     private var cancellables = Set<AnyCancellable>()
     
     init() {
@@ -25,7 +23,6 @@ final class FlightSearchViewModel {
     }
 
     private func fetchFlights(query: String) {
-        // Placeholder: In next PR, call repository with pagination
     }
 
     func selectFlight(_ flight: Flight) {

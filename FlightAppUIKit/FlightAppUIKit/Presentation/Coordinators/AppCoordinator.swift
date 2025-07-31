@@ -13,14 +13,19 @@ final class AppCoordinator: Coordinator {
     }
 
     func start() {
-        // Step 1: Create Repository
-        let repository = OpenSkyFlightRepository(apiService: APIService.shared)
+        // Step 1: Create Repositories
+        let flightRepository = OpenSkyFlightRepository(apiService: APIService.shared)
+        let favoriteRepository = FavoriteFlightRepositoryImpl.shared
 
-        // Step 2: Create Use Case
-        let useCase = DefaultFetchFlightsUseCase(repository: repository)
+        // Step 2: Create Use Cases
+        let fetchUseCase = DefaultFetchFlightsUseCase(repository: flightRepository)
+        let toggleFavoriteUseCase = DefaultToggleFavoriteFlightUseCase(repository: favoriteRepository)
 
         // Step 3: Create ViewModel
-        let viewModel = FlightListViewModel(fetchFlightsUseCase: useCase)
+        let viewModel = FlightListViewModel(
+            fetchFlightsUseCase: fetchUseCase,
+            toggleFavoriteUseCase: toggleFavoriteUseCase
+        )
 
         // Step 4: Create ViewController
         let viewController = FlightListViewController(viewModel: viewModel, coordinator: self)

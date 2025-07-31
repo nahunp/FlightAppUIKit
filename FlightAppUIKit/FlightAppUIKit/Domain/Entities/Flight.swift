@@ -15,6 +15,7 @@ public struct Flight: Equatable {
     public let verticalRate: Double?
     public let sensors: [Int]?
     public let geoAltitude: Double?
+    public var isFavorite: Bool = false
 
     public init(
         icao24: String,
@@ -30,7 +31,8 @@ public struct Flight: Equatable {
         trueTrack: Double?,
         verticalRate: Double?,
         sensors: [Int]?,
-        geoAltitude: Double?
+        geoAltitude: Double?,
+        isFavorite: Bool = false
     ) {
         self.icao24 = icao24
         self.callsign = callsign
@@ -46,5 +48,6 @@ public struct Flight: Equatable {
         self.verticalRate = verticalRate
         self.sensors = sensors
         self.geoAltitude = geoAltitude
+        self.isFavorite = isFavorite
     }
 }

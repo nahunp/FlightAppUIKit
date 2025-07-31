@@ -6,16 +6,16 @@ struct FlightMapper {
             icao24: dto.icao24,
             callsign: dto.callsign,
             originCountry: dto.originCountry,
-            timePosition: nil,      // add if FlightStateDTO has it
-            lastContact: nil,        // add if FlightStateDTO has it
+            timePosition: nil,
+            lastContact: nil,
             longitude: dto.longitude,
             latitude: dto.latitude,
-            barometricAltitude: nil, // add if FlightStateDTO has it
-            onGround: false,           // add if FlightStateDTO has it
+            barometricAltitude: nil,
+            onGround: false,
             velocity: dto.velocity,
-            trueTrack: nil,          // add if FlightStateDTO has it
-            verticalRate: nil,       // add if FlightStateDTO has it
-            sensors: nil,            // add if FlightStateDTO has it
+            trueTrack: nil,
+            verticalRate: nil,
+            sensors: nil,
             geoAltitude: dto.geoAltitude
         )
     }
