@@ -1,5 +1,5 @@
 import Combine
 
 public protocol FetchFlightsUseCase {
-    func execute() -> AnyPublisher<[Flight], Error>
+    func execute(query: String, page: Int) -> AnyPublisher<[Flight], Error>
 }

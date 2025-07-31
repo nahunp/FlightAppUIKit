@@ -139,13 +139,3 @@ extension FlightListViewController: UITableViewDelegate, UITableViewDataSource, 
         let selectedFlight = viewModel.flights[indexPath.row]
         coordinator.showFlightDetail(for: selectedFlight)
     }
-
-    func didTapFavorite(for flight: Flight) {
-        viewModel.toggleFavorite(flight: flight)
-        tableView.reloadData()
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.searchFlights(query: searchText)
-    }
-}
