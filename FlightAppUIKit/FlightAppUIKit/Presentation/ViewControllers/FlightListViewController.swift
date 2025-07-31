@@ -1,15 +1,15 @@
 import UIKit
 import Combine
 
-final class FlightListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+final class FlightListViewController: UIViewController, UISearchBarDelegate {
     
     // MARK: - UI Components
     
     private let tableView = UITableView()
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     private let errorLabel = UILabel()
-    private let coordinator: AppCoordinator
     private let searchBar = UISearchBar()
+    private let coordinator: AppCoordinator
     
     // MARK: - ViewModel
     
@@ -42,6 +42,7 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
+        // Search Bar
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.placeholder = "Search flights or country"
         searchBar.delegate = self
@@ -49,7 +50,7 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
         
         // Table View
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "FlightCell")
+        tableView.register(FlightCell.self, forCellReuseIdentifier: FlightCell.reuseIdentifier)
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
@@ -68,18 +69,22 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
         
         // AutoLayout
         NSLayoutConstraint.activate([
+            // SearchBar constraints
             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
+            // TableView constraints
             tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
+            // Activity Indicator
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
+            // Error Label
             errorLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             errorLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             errorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -113,43 +118,24 @@ final class FlightListViewController: UIViewController, UITableViewDataSource, U
     }
 }
 
-extension FlightListViewController: UISearchBarDelegate {
+extension FlightListViewController: UITableViewDelegate, UITableViewDataSource, FlightCellDelegate {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.flights.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let flight = viewModel.flights[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "FlightCell", for: indexPath)
-        
-        var content = cell.defaultContentConfiguration()
-        content.text = flight.callsign ?? "No Callsign"
-        content.secondaryText = flight.originCountry
-        cell.contentConfiguration = content
-        
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "FlightCell", for: indexPath) as? FlightCell else {
+            return UITableViewCell()
+        }
+
+        cell.configure(with: flight)
+        cell.delegate = self
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedFlight = viewModel.flights[indexPath.row]
         coordinator.showFlightDetail(for: selectedFlight)
     }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.size.height
-        
-        if offsetY > contentHeight - height * 2 {
-            viewModel.loadNextPageIfNeeded(currentIndex: viewModel.flights.count - 1)
-        }
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.searchFlights(query: searchText)
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
-    }
-}

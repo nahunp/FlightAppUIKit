@@ -3,7 +3,13 @@ import Combine
 
 final class FlightSearchViewModel: FlightSearchViewModelInput, FlightSearchViewModelOutput {
 
-    var flightsValue: [Flight] {
+    @Published var searchQuery: String = ""
+    @Published private(set) var flights: [Flight] = []
+    private var cancellables = Set<AnyCancellable>()
+    
+    init() {
+        bindSearch()
+        var flightsValue: [Flight]
         return flights.value
     }
     // MARK: - Inputs
@@ -74,5 +80,12 @@ final class FlightSearchViewModel: FlightSearchViewModelInput, FlightSearchViewM
                 }
             })
             .store(in: &cancellables)
+    }
+
+    private func fetchFlights(query: String) {
+    }
+
+    func selectFlight(_ flight: Flight) {
+        coordinator?.showFlightDetail(flight: flight)
     }
 }
