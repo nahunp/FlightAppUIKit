@@ -1,8 +1,10 @@
 import UIKit
 import Combine
 
-final class FlightListViewController: UIViewController, UISearchBarDelegate {
+final class FlightListViewController: UIViewController {
     
+    private let searchTextSubject = PassthroughSubject<String, Never>()
+
     // MARK: - UI Components
     
     private let tableView = UITableView()
@@ -115,27 +117,45 @@ final class FlightListViewController: UIViewController, UISearchBarDelegate {
                 self?.errorLabel.isHidden = errorMessage == nil
             }
             .store(in: &cancellables)
+        
+        searchTextSubject
+            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] text in
+                self?.viewModel.searchFlights(query: text)
+            }
+            .store(in: &cancellables)
     }
 }
 
-extension FlightListViewController: UITableViewDelegate, UITableViewDataSource, FlightCellDelegate {
+extension FlightListViewController: UITableViewDelegate, UITableViewDataSource, FlightCellDelegate, UISearchBarDelegate {
+    
+    func didTapFavorite(for flight: Flight) {
+        viewModel.toggleFavorite(flight: flight)
+    }
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.flights.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let flight = viewModel.flights[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "FlightCell", for: indexPath) as? FlightCell else {
             return UITableViewCell()
         }
-
+        
         cell.configure(with: flight)
         cell.delegate = self
         return cell
     }
-
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedFlight = viewModel.flights[indexPath.row]
         coordinator.showFlightDetail(for: selectedFlight)
     }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchTextSubject.send(searchText)
+    }
+}

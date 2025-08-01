@@ -23,7 +23,7 @@ final class AppCoordinator: Coordinator {
 
         // Step 3: Create ViewModel
         let viewModel = FlightListViewModel(
-            fetchFlightsUseCase: fetchUseCase,
+            fetchUseCase: fetchUseCase,
             toggleFavoriteUseCase: toggleFavoriteUseCase
         )
 
